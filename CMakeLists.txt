@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.10)
 project(libffi C)
 
 set(SOURCES_LIST
     src/closures.c
-    src/java_raw_api
+    src/java_raw_api.c
     src/prep_cif.c
     src/raw_api.c
     src/types.c)
 
-if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+if(CMAKE_BUILD_TYPE MATCHES Debug)
     list(APPEND SOURCES_LIST src/debug.c)
     add_definitions(-DFFI_DEBUG)
 endif()
@@ -34,31 +34,6 @@ target_include_directories(
   ffi_static PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>")
 
-if(MSVC)
-    add_definitions(-DFFI_BUILDING_DLL)
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
-    set(CMAKE_MACOSX_RPATH 1)
-endif()
-add_library(ffi_shared SHARED $<TARGET_OBJECTS:objlib> ${OBJECTS_LIST})
-
-target_include_directories(
-  ffi_shared PUBLIC
-  "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 set_target_properties(ffi_static PROPERTIES OUTPUT_NAME ffi)
-set_target_properties(ffi_shared PROPERTIES OUTPUT_NAME ffi)
-
-install(TARGETS ffi_static ffi_shared
-    EXPORT ${PROJECT_NAME}Targets
-    RUNTIME DESTINATION bin
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib)
-
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION share/${PROJECT_NAME})
-
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/include/ffi.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/ffitarget.h
-    DESTINATION include)
