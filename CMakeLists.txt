@@ -28,12 +28,10 @@ add_definitions(-DFFI_BUILDING)
 add_library(objlib OBJECT ${SOURCES_LIST})
 set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
 
-add_library(ffi_static STATIC $<TARGET_OBJECTS:objlib>)
+add_library(libffi STATIC $<TARGET_OBJECTS:objlib>)
 
 target_include_directories(
-  ffi_static PUBLIC
+  libffi PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>")
 
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
-set_target_properties(ffi_static PROPERTIES OUTPUT_NAME ffi)
